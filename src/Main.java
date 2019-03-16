@@ -14,14 +14,14 @@
 // Output:	Will output required steps user needs to take
 // ***********************************************************************
 
+import java.io.IOException;
 import javax.swing.*;
 import java.text.DecimalFormat;
-import java.util.Scanner;
 
 
 public class Main
 {  // begin class
-	public static void main(String args[])
+	public static void main(String args[]) throws IOException
 	{  // begin main
 	// ***** declaration of constants *****
 	
@@ -29,11 +29,8 @@ public class Main
 	
 	// ***** create objects *****
 		
-		
-	// ***** create input stream *****
+		Communicator comm = new Communicator();
 	
-		Scanner scan = new Scanner(System.in);
-		
 	// ***** Print Banner *****
 	
 		System.out.println("**********************************");
@@ -44,7 +41,9 @@ public class Main
 		
 	// ***** main body *****
 	
-
+        comm.startUp();
+        comm.calibration();
+        
 	// ***** closing message *****
 	
 		System.out.println("end of processing");
