@@ -23,6 +23,7 @@ import java.util.Scanner;
     // *********** class constants **********
      
         final private int SM = 3; //number of sensor modules
+        final private int Threshhold = 70;//number at which contraction starts
      
     // ********** instance variable **********
      
@@ -63,6 +64,7 @@ import java.util.Scanner;
                 while(true){}
             } //end of else not found
             
+            /*
             if (RobotPortFound){
             
             RobotComPort.openPort();
@@ -76,6 +78,7 @@ import java.util.Scanner;
                 System.out.println("Robotic Port Not Found");
                 while(true){}
             }
+            */
      }//end of default constructor
      
     // ********** Methods **********
@@ -110,18 +113,25 @@ import java.util.Scanner;
     */
     public void startUp() throws IOException{
         int incoming = 0;
+        boolean notFound  = true;
+        
+        System.out.println("Press reset button on glove...");
         
         for(int sensor = 0; sensor < SM; sensor++){
+            do{
             while(ICPIn.available()==0){}
             incoming = ICPIn.read();
             if(incoming == '#'){
-                System.out.println("Sensor Module " + sensor + ": Responding...\n");
+                System.out.println("Sensor Module " + sensor + ": Responding...");
+                notFound  = false;
             }//end of if sensor is working
-            else{
-                System.out.println("Sensor Module " + sensor + ": Not Responding...\n");
+            else if (incoming == '!'){
+                System.out.println("Sensor Module " + sensor + ": Not Responding...");
                 while(true){}
             }//end of else not responding
+            }while(notFound);
         }//end of for each sensor module
+        System.out.println("*************************************************\n");
     }// end of start up
     
     /*
@@ -140,6 +150,7 @@ import java.util.Scanner;
                 System.out.println("Please open and close your hand a couple times."
                         + "\nWhen complete enter a character. Round: " + sensor + "/3");
                 while(!scan.hasNext()){}
+                scan.next();
                 ICPOut.write('#'); //tells arduino to continue
             }//end of if prompted for calibration
             else{
@@ -147,6 +158,7 @@ import java.util.Scanner;
                 while(true){}
             }//end of else if error
         }//end of for each module
+        System.out.println("*************************************************\n");
     }//end of calibration
     
    /*
@@ -157,10 +169,38 @@ import java.util.Scanner;
     public int[] retrieveDataPack() throws IOException{
         int[] out = new int[5];
         String delim = "[_]+";
+        String combine = "";
+        char in;
         
         ICPOut.write('#');
-        
-        
+        for(int finger = 0; finger < 5; finger++){
+            while((ICPIn.available()==0)){}
+            in = (char) ICPIn.read();
+            
+            while(Character.isDigit(in)){
+                combine += (char) in;
+                
+                while(ICPIn.available()==0){}
+                in = (char) ICPIn.read();
+            }//end of while digit
+            
+            out[finger] = Integer.parseInt(combine);
+            combine = "";
+        }//end of for each finger
         return out;
     }//end of retrieve data packet
+    
+    public void sendDataPack(int[] data){
+        
+    }//end of send data pack
+    
+    public void printData() throws IOException{
+        int[] hand  = new int[5];
+        
+        hand = retrieveDataPack();
+            for(int i = 0; i < hand.length; i++){
+                System.out.println("Finger " + i + ": " + hand[i] + " ");
+            }//end of for each finger
+            System.out.println("\n*************************************************\n");
+    }
  }  // end class
