@@ -132,6 +132,9 @@ import java.util.Scanner;
             }while(notFound);
         }//end of for each sensor module
         System.out.println("*************************************************\n");
+        
+        //notifies robotic hand, port established & requests can be added to queue
+        RCPOut.write('#'); 
     }// end of start up
     
     /*
@@ -168,7 +171,6 @@ import java.util.Scanner;
     */
     public int[] retrieveDataPack() throws IOException{
         int[] out = new int[5];
-        String delim = "[_]+";
         String combine = "";
         char in;
         
@@ -184,16 +186,56 @@ import java.util.Scanner;
                 in = (char) ICPIn.read();
             }//end of while digit
             
+            try{
             out[finger] = Integer.parseInt(combine);
+            }//if not proper data
+            catch(NumberFormatException e){
+                //This will execute if reset button is pressed which is acting
+                //as this programs kill switch
+                System.out.println("End of Processing");
+                System.exit(0); //end program
+            }//ends program
+            
             combine = "";
         }//end of for each finger
         return out;
     }//end of retrieve data packet
     
-    public void sendDataPack(int[] data){
+    /*
+    Purpose: takes the set of data and compairs it to the threshold to make a
+                simplified data packet to send
+    Input: the sensor data for each finger as an array (int[5])
+    Output: simplified data for each finger(byte[]) through wired serial port
+    */
+    public void sendDataPack(int[] data) throws IOException{
+        String output = "";
         
+        while(RCPIn.available()==0){} //waits if request for data not sent
+        RCPIn.read(); //clears the request 
+        
+        for(int finger = 0; finger<4; finger++){
+            if(data[finger]<=Threshhold){
+                output += "1_";
+            }//end of if passes threshhold
+            else{
+                output+= "0_";
+            }//end of else under threshhold
+        }//end of for each finger loop
+        
+        if(data[4] <= Threshhold){
+            output += "1";
+        }//end of if passes threshhold for last data point
+        else{
+            output += "0";
+        }//end of else doesnt pass threshold for last data point
+        
+        RCPOut.write(output.getBytes()); //sends the data as bytes to robot's arduino
     }//end of send data pack
     
+    /*
+    Purpose: prints the current data from sensors, used for testing and
+                troubleshooting
+    */
     public void printData() throws IOException{
         int[] hand  = new int[5];
         
@@ -202,5 +244,6 @@ import java.util.Scanner;
                 System.out.println("Finger " + i + ": " + hand[i] + " ");
             }//end of for each finger
             System.out.println("\n*************************************************\n");
-    }
+    }//end of print data
+    
  }  // end class
