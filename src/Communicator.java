@@ -64,21 +64,21 @@ import java.util.Scanner;
                 while(true){}
             } //end of else not found
             
-            /*
+            
             if (RobotPortFound){
             
             RobotComPort.openPort();
             
             RCPOut = RobotComPort.getOutputStream();
             RCPIn = RobotComPort.getInputStream();
-            RCPIn.skip(RCPIn.available());
+            //RCPIn.skip(RCPIn.available());
             
             }//end of if port found
             else{
                 System.out.println("Robotic Port Not Found");
                 while(true){}
             }
-            */
+            
      }//end of default constructor
      
     // ********** Methods **********
@@ -151,7 +151,7 @@ import java.util.Scanner;
             incoming = ICPIn.read();
             if(incoming == '?'){
                 System.out.println("Please open and close your hand a couple times."
-                        + "\nWhen complete enter a character. Round: " + sensor + "/3");
+                        + "\nWhen complete enter a character. Round: " + sensor + "/2");
                 while(!scan.hasNext()){}
                 scan.next();
                 ICPOut.write('#'); //tells arduino to continue
@@ -213,7 +213,7 @@ import java.util.Scanner;
         while(RCPIn.available()==0){} //waits if request for data not sent
         RCPIn.read(); //clears the request 
         
-        for(int finger = 0; finger<4; finger++){
+        for(int finger = 0; finger<5; finger++){
             if(data[finger]<=Threshhold){
                 output += "1_";
             }//end of if passes threshhold
@@ -221,13 +221,6 @@ import java.util.Scanner;
                 output+= "0_";
             }//end of else under threshhold
         }//end of for each finger loop
-        
-        if(data[4] <= Threshhold){
-            output += "1";
-        }//end of if passes threshhold for last data point
-        else{
-            output += "0";
-        }//end of else doesnt pass threshold for last data point
         
         RCPOut.write(output.getBytes()); //sends the data as bytes to robot's arduino
     }//end of send data pack

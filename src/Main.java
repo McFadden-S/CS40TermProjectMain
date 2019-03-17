@@ -48,9 +48,5 @@ public class Main
             comm.sendDataPack(comm.retrieveDataPack());
         }//end of main while loop
 
-    // ***** closing message *****
-
-        //System.out.println("end of processing");
-	
     }  // end main	
 }  // end class
