@@ -23,7 +23,7 @@ import java.util.Scanner;
     // *********** class constants **********
      
         final private int SM = 3; //number of sensor modules
-        final private int Threshhold = 70;//number at which contraction starts
+        final private int Threshhold = 40;//number at which contraction starts
      
     // ********** instance variable **********
      
@@ -193,6 +193,7 @@ import java.util.Scanner;
                 //This will execute if reset button is pressed which is acting
                 //as this programs kill switch
                 System.out.println("End of Processing");
+                RCPOut.write("2".getBytes());
                 System.exit(0); //end program
             }//ends program
             
